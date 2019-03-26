@@ -4,6 +4,7 @@ interface Shape {
     void draw();
 }
 
+
 class Rectangle implements Shape {
 
     @Override
@@ -11,6 +12,7 @@ class Rectangle implements Shape {
         System.out.println("Inside Rectangle::draw() method.");
     }
 }
+
 
 class Square implements Shape {
 
@@ -20,6 +22,7 @@ class Square implements Shape {
     }
 }
 
+
 class Circle implements Shape {
 
     @Override
@@ -28,48 +31,70 @@ class Circle implements Shape {
     }
 }
 
-class ShapeFactory {
 
-    //use getShape method to get object of type shape
-    Shape getShape(String shapeType) {
-        if (shapeType == null) {
-            return null;
-        }
-        if (shapeType.equalsIgnoreCase("CIRCLE")) {
-            return new Circle();
+class Default implements Shape {
 
-        } else if (shapeType.equalsIgnoreCase("RECTANGLE")) {
-            return new Rectangle();
-
-        } else if (shapeType.equalsIgnoreCase("SQUARE")) {
-            return new Square();
-        }
-
-        return null;
+    @Override
+    public void draw() {
+        System.out.println("Inside Default::draw() method.");
     }
 }
+
+
+// TODO: Singleton ?
+class ShapeFactory {
+
+    private Shape aDefault;
+    /**
+     * Ctor will change behaviour of the factory to return different types of default object
+     * @param shape shape to be returned as default shape
+     */
+    public ShapeFactory(Shape shape) {
+        aDefault = shape;
+    }
+
+    public ShapeFactory() {
+        aDefault = new Default();
+    }
+
+    Shape getShape(Types shapeType) {
+        if (shapeType == Types.CIRCLE) {
+            return new Circle();
+        } else if (shapeType == Types.RECTANGLE) {
+            return new Rectangle();
+
+        } else if ((shapeType == Types.SQUARE)) {
+            return new Square();
+        } else {
+            return aDefault;
+        }
+    }
+
+    enum Types {
+        UNKNOWN, CIRCLE, RECTANGLE, SQUARE
+    }
+}
+
 
 class FactoryPatternDemo {
 
     public static void main(String[] args) {
-        ShapeFactory shapeFactory = new ShapeFactory();
+        ShapeFactory shapeFactory = new ShapeFactory(new Circle());
 
-        //get an object of Circle and call its draw method.
-        Shape shape1 = shapeFactory.getShape("CIRCLE");
+        Shape circle = shapeFactory.getShape(ShapeFactory.Types.CIRCLE);
+        circle.draw();
 
-        //call draw method of Circle
-        shape1.draw();
+        Shape rectangle = shapeFactory.getShape(ShapeFactory.Types.RECTANGLE);
+        rectangle.draw();
 
-        //get an object of Rectangle and call its draw method.
-        Shape shape2 = shapeFactory.getShape("RECTANGLE");
+        Shape square = shapeFactory.getShape(ShapeFactory.Types.SQUARE);
+        square.draw();
 
-        //call draw method of Rectangle
-        shape2.draw();
+        Shape unknown = shapeFactory.getShape(ShapeFactory.Types.UNKNOWN);
+        unknown.draw();
 
-        //get an object of Square and call its draw method.
-        Shape shape3 = shapeFactory.getShape("SQUARE");
-
-        //call draw method of square
-        shape3.draw();
+        ShapeFactory shapeFactoryDefault = new ShapeFactory();
+        Shape defaultShape = shapeFactoryDefault.getShape(ShapeFactory.Types.UNKNOWN);
+        defaultShape.draw();
     }
 }
